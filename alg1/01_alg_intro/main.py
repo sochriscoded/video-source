@@ -1,5 +1,11 @@
 from manim import *
 
+#TODO: Construct Scene 1 (intro) and Scene 6 (conclusion)
+
+class Scene1(Scene):
+    def construc(self):
+        text = MathTex("y = mx+b")
+
 class Scene2(Scene):
     def construct(self):
         r = 2
@@ -214,9 +220,11 @@ class Scene4 (Scene):
       self.wait(2)
       self.clear()
 
-
 class Scene5 (Scene):
   def construct(self):
+      
+      def func(x):
+          return x**2
 
       x_tracker = ValueTracker(1)
 
@@ -283,4 +291,32 @@ class Scene5 (Scene):
       # Finally draw the full curve
       self.play(Create(sqrarea))
       self.play(FadeOut(dots))
+      self.wait(2)
+
+      # Put a dot on the curve and as it slides around, update the values of A and X
+      t = ValueTracker(-10)
+
+      new_area_label = MathTex("100").move_to(new_square.get_center()).set_color(YELLOW)
+
+      new_area_label.add_updater(
+            lambda m: m.become(
+                MathTex(f"{int(round(func(t.get_value())))}").set_color(YELLOW).move_to(new_square.get_center())))
+    
+      new_x_label = MathTex("x=-10").next_to(new_square, DOWN).set_color(BLUE)
+
+      new_x_label.add_updater(
+          lambda m: m.become(
+                MathTex(f"x={int(round(t.get_value()))}").next_to(new_square, DOWN).set_color(BLUE)
+      ))
+
+      initial_point = ax.coords_to_point(t.get_value(), func(t.get_value()))
+      new_dot = Dot(point=initial_point).add_updater(
+          lambda m: m.move_to(ax.c2p(t.get_value(), func(t.get_value())))
+      ).set_color(GREEN_E)
+
+      self.play(FadeOut(area_label, x_label))
+      self.play(Write(new_area_label), Write(new_x_label))
+      self.add(new_dot)
+      self.wait(1)
+      self.play(t.animate.set_value(10), run_time=10, rate_func=linear)
       self.wait(2)
